@@ -2,13 +2,13 @@
 
 /**
  * interactive - returns true if shell is interactive mode
- * @info: struct address
+ * @data: struct address
  * Return: 1 if interactive mode, 0 otherwise
  */
 
-int interactive(info_t *info)
+int interactive(data_d *data)
 {
-	return (isatty(STDIN_FILENO) && info->readfd <= 2);
+	return (isatty(STDIN_FILENO) && data->readfd <= 2);
 }
 
 /**

@@ -2,13 +2,13 @@
 
 /**
  * is_chain - test if current char in buffer is chain delimeter
- * @info: parameter struct
+ * @data: parameter struct
  * @buff: char buffer
  * @pb: address of current position in buff
  * Return: 1 if chain delimeter, 0 otherwise
  */
 
-int is_chain(info_t *info, char *buff, size_t *pb)
+int is_chain(data_d *data, char *buff, size_t *pb)
 {
 	size_t j = *pb;
 
@@ -16,18 +16,18 @@ int is_chain(info_t *info, char *buff, size_t *pb)
 	{
 		buff[j] = 0;
 		j++;
-		info->cmd_buff_type = CMD_OR;
+		data->cmd_buff_type = CMD_OR;
 	}
 	else if (buff[j] == '&' && buff[j + 1] == '&')
 	{
 		buff[j] = 0;
 		j++;
-		info->cmd_buff_type = CMD_AND;
+		data->cmd_buff_type = CMD_AND;
 	}
 	else if (buff[j] == ';') /* found end of this command */
 	{
 		buff[j] = 0; /* replace semicolon with null */
-		info->cmd_buff_type = CMD_CHAIN;
+		data->cmd_buff_type = CMD_CHAIN;
 	}
 	else
 		return (0);
@@ -37,7 +37,7 @@ int is_chain(info_t *info, char *buff, size_t *pb)
 
 /**
  * check_chain - checks we should continue chaining based on last status
- * @info: parameter struct
+ * @data: parameter struct
  * @buff: char buffer
  * @pb: address of current position in buff
  * @sb: starting position in buff
@@ -45,21 +45,21 @@ int is_chain(info_t *info, char *buff, size_t *pb)
  * Return: void
  */
 
-void check_chain(info_t *info, char *buff, size_t *pb, size_t sb, size_t len)
+void check_chain(data_d *data, char *buff, size_t *pb, size_t sb, size_t len)
 {
 	size_t j = *pb;
 
-	if (info->cmd_buff_type == CMD_AND)
+	if (data->cmd_buff_type == CMD_AND)
 	{
-		if (info->status)
+		if (data->status)
 		{
 			buff[sb] = 0;
 			j = len;
 		}
 	}
-	if (info->cmd_buff_type == CMD_OR)
+	if (data->cmd_buff_type == CMD_OR)
 	{
-		if (!info->status)
+		if (!data->status)
 		{
 			buff[sb] = 0;
 			j = len;
@@ -71,11 +71,11 @@ void check_chain(info_t *info, char *buff, size_t *pb, size_t sb, size_t len)
 
 /**
  * replace_alias - replaces aliases in tokenized string
- * @info: parameter struct
+ * @data: parameter struct
  * Return: 1 if replaced, 0 otherwise
  */
 
-int replace_alias(info_t *info)
+int replace_alias(data_d *data)
 {
 	int i;
 	list_t *node;
@@ -83,57 +83,57 @@ int replace_alias(info_t *info)
 
 	for (i = 0; i < 10; i++)
 	{
-		node = node_starts_with(info->alias, info->argv[0], '=');
+		node = node_starts_with(data->alias, data->argv[0], '=');
 		if (!node)
 			return (0);
-		free(info->argv[0]);
+		free(data->argv[0]);
 		p = _strchr(node->str, '=');
 		if (!p)
 			return (0);
 		p = _strdup(p + 1);
 		if (!p)
 			return (0);
-		info->argv[0] = p;
+		data->argv[0] = p;
 	}
 	return (1);
 }
 
 /**
  * replace_vars - replaces vars in tokenized string
- * @info: parameter struct
+ * @data: parameter struct
  * Return: 1 if replaced, 0 otherwise
  */
 
-int replace_vars(info_t *info)
+int replace_vars(data_d *data)
 {
 	int i = 0;
 	list_t *node;
 
-	for (i = 0; info->argv[i]; i++)
+	for (i = 0; data->argv[i]; i++)
 	{
-		if (info->argv[i][0] != '$' || !info->argv[i][1])
+		if (data->argv[i][0] != '$' || !data->argv[i][1])
 			continue;
 
-		if (!_strcmp(info->argv[i], "$?"))
+		if (!_strcmp(data->argv[i], "$?"))
 		{
-			replace_string(&(info->argv[i]),
-					_strdup(convert_num(info->status, 10, 0)));
+			replace_string(&(data->argv[i]),
+					_strdup(convert_num(data->status, 10, 0)));
 			continue;
 		}
-		if (!_strcmp(info->argv[i], "$$"))
+		if (!_strcmp(data->argv[i], "$$"))
 		{
-			replace_string(&(info->argv[i]),
+			replace_string(&(data->argv[i]),
 					_strdup(convert_num(getpid(), 10, 0)));
 			continue;
 		}
-		node = node_starts_with(info->env, &info->argv[i][1], '=');
+		node = node_starts_with(data->env, &data->argv[i][1], '=');
 		if (node)
 		{
-			replace_string(&(info->argv[i]),
+			replace_string(&(data->argv[i]),
 					_strdup(_strchr(node->str, '=') + 1));
 			continue;
 		}
-		replace_string(&info->argv[i], _strdup(""));
+		replace_string(&data->argv[i], _strdup(""));
 
 	}
 	return (0);

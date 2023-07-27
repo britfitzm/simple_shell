@@ -31,19 +31,19 @@ int _erratoi(char *s)
 
 /**
  * print_err - prints error message
- * @info: parameter & return info struct
+ * @data: parameter & return info struct
  * @estr: string containing specified error type
  * Return: 0 if no numbers in string, converted number otherwise
  *        -1 on error
  */
 
-void print_err(info_t *info, char *estr)
+void print_err(data_d *data, char *estr)
 {
-	_eputs(info->fname);
+	_eputs(data->fname);
 	_eputs(": ");
-	print_d(info->line_count, STDERR_FILENO);
+	print_d(data->line_count, STDERR_FILENO);
 	_eputs(": ");
-	_eputs(info->argv[0]);
+	_eputs(data->argv[0]);
 	_eputs(": ");
 	_eputs(estr);
 }

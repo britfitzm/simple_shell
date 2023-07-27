@@ -51,7 +51,7 @@ typedef struct liststr
 } list_t;
 
 /**
- * struct passinfo - contains pseudo-arguements to pass into function,
+ * struct passdata - contains pseudo-arguements to pass into function,
  * allowing uniform prototype for function pointer struct
  * @arg: string generated from getline containing arguements
  * @argv: array of strings generated from arg
@@ -73,7 +73,7 @@ typedef struct liststr
  * @histcount: history line number count
  */
 
-typedef struct passinfo
+typedef struct passdata
 {
 	char *arg;
 	char **argv;
@@ -94,7 +94,7 @@ typedef struct passinfo
 	int cmd_buff_type; /* CMD_type ||, &&, ; */
 	int readfd;
 	int histcount;
-} info_t;
+} data_d;
 
 #define INFO_INIT \
 {NULL, NULL, NULL, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, \
@@ -109,19 +109,19 @@ typedef struct passinfo
 typedef struct builtin
 {
 	char *type;
-	int (*func)(info_t *);
+	int (*func)(data_d *data);
 } builtin_table;
 
 /* shell.c */
-int hsh(info_t *info, char **av);
-int find_builtin(info_t *info);
-void find_cmd(info_t *info);
-void fork_cmd(info_t *info);
+int hsh(data_d *data, char **av);
+int find_builtin(data_d *data);
+void find_cmd(data_d *data);
+void fork_cmd(data_d *data);
 
 /* parser.c */
-int is_cmd(info_t *info, char *path);
+int is_cmd(data_d *data, char *path);
 char *dup_chars(char *pathstr, int start, int stop);
-char *find_path(info_t *info, char *pathstr, char *cmd);
+char *find_path(data_d *data, char *pathstr, char *cmd);
 
 /* loophsh.c */
 int loophsh(char **);
@@ -162,60 +162,60 @@ void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
 int bfree(void **ptr);
 
 /* _atoi.c */
-int interactive(info_t *info);
+int interactive(data_d *data);
 int is_delim(char c, char *delim);
 int _isalpha(int c);
 int _atoi(char *s);
 
 /* errors_2.c */
 int _erratoi(char *s);
-void print_err(info_t *info, char *estr);
+void print_err(data_d *data, char *estr);
 int print_d(int input, int fd);
 char *convert_num(long int num, int base, int flags);
 void remove_comments(char *buff);
 
 /* builtin_1.c */
-int _myexit(info_t *info);
-int _mycd(info_t *info);
-int _myhelp(info_t *info);
+int _myexit(data_d *data);
+int _mycd(data_d *data);
+int _myhelp(data_d *data);
 
 /* builtin_2.c */
-int _myhist(info_t *info);
-int _myalias(info_t *info);
-int unset_alias(info_t *info, char *str);
-int set_alias(info_t *info, char *str);
+int _myhist(data_d *data);
+int _myalias(data_d *data);
+int unset_alias(data_d *data, char *str);
+int set_alias(data_d *data, char *str);
 int print_alias(list_t *node);
 
 /* getline.c */
-ssize_t get_input(info_t *info);
-int _getline(info_t *info, char **ptr, size_t *length);
+ssize_t get_input(data_d *data);
+int _getline(data_d *data, char **ptr, size_t *length);
 void sigintHandler(__attribute__((unused))int sig_num);
-ssize_t read_buff(info_t *info, char *buff, size_t *s);
-ssize_t input_buff(info_t *info, char **buff, size_t *len);
+ssize_t read_buff(data_d *data, char *buff, size_t *s);
+ssize_t input_buff(data_d *data, char **buff, size_t *len);
 
 /* getinfo.c */
-void clear_info(info_t *info);
-void set_info(info_t *info, char **av);
-void free_info(info_t *info, int all);
+void clear_info(data_d *data);
+void set_info(data_d *data, char **av);
+void free_info(data_d *data, int all);
 
 /* env.c */
-char *_getenv(info_t *info, const char *name);
-int _myenv(info_t *info);
-int _mysetenv(info_t *info);
-int _myunsetenv(info_t *info);
-int populate_env_list(info_t *info);
+char *_getenv(data_d *data, const char *name);
+int _myenv(data_d *data);
+int _mysetenv(data_d *data);
+int _myunsetenv(data_d *data);
+int populate_env_list(data_d *data);
 
 /* getenv.c */
-char **get_environ(info_t *info);
-int _unsetenv(info_t *info, char *var);
-int _setenv(info_t *info, char *var, char *value);
+char **get_environ(data_d *data);
+int _unsetenv(data_d *data, char *var);
+int _setenv(data_d *data, char *var, char *value);
 
 /* history.c */
-char *get_hist_file(info_t *info);
-int write_hist(info_t *info);
-int read_hist(info_t *info);
-int build_hist_list(info_t *info, char *buff, int linecount);
-int renum_hist(info_t *info);
+char *get_hist_file(data_d *data);
+int write_hist(data_d *data);
+int read_hist(data_d *data);
+int build_hist_list(data_d *data, char *buff, int linecount);
+int renum_hist(data_d *data);
 
 /* list_1.c */
 list_t *add_node(list_t **head, const char *str, int num);
@@ -232,10 +232,10 @@ list_t *node_starts_with(list_t *node, char *prefix, char c);
 ssize_t get_node_index(list_t *head, list_t *node);
 
 /* variables.c */
-int is_chain(info_t *info, char *buff, size_t *pb);
-void check_chain(info_t *info, char *buff, size_t *pb, size_t sb, size_t len);
-int replace_alias(info_t *info);
-int replace_vars(info_t *info);
+int is_chain(data_d *data, char *buff, size_t *pb);
+void check_chain(data_d *data, char *buff, size_t *pb, size_t sb, size_t len);
+int replace_alias(data_d *data);
+int replace_vars(data_d *data);
 int replace_string(char **old, char *new);
 
 #endif
